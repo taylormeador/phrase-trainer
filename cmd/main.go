@@ -22,10 +22,13 @@ func main() {
 	}
 	defer streamer.Close()
 
-	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+	sr := format.SampleRate * 2
+	speaker.Init(sr, sr.N(time.Second/100))
+
+	resampled := beep.Resample(4, format.SampleRate, sr, streamer)
 
 	done := make(chan bool)
-	speaker.Play(beep.Seq(streamer, beep.Callback(func() {
+	speaker.Play(beep.Seq(resampled, beep.Callback(func() {
 		done <- true
 	})))
 
