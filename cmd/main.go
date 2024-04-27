@@ -25,8 +25,11 @@ func main() {
 
 	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 
+	loop := beep.Loop(3, streamer)
+	fast := beep.ResampleRatio(4, 5, loop)
+
 	done := make(chan bool)
-	speaker.Play(beep.Seq(streamer, beep.Callback(func() {
+	speaker.Play(beep.Seq(fast, beep.Callback(func() {
 		done <- true
 	})))
 
