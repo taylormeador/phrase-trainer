@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/gopxl/beep"
-	"github.com/gopxl/beep/effects"
 	"github.com/gopxl/beep/mp3"
 	"github.com/gopxl/beep/speaker"
 )
@@ -22,28 +21,18 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer streamer.Close()
 
 	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 
-	ctrl := &beep.Ctrl{Streamer: beep.Loop(-1, streamer), Paused: false}
-	volume := &effects.Volume{
-		Streamer: ctrl,
-		Base:     2,
-		Volume:   0,
-		Silent:   false,
-	}
-	speedy := beep.ResampleRatio(4, 1, volume)
-	speaker.Play(speedy)
+	buffer := beep.NewBuffer(format)
+	buffer.Append(streamer)
+	streamer.Close()
 
 	for {
-		fmt.Print("Press [ENTER] to pause/resume. ")
+		fmt.Print("Press [ENTER] to fire a gunshot! ")
 		fmt.Scanln()
 
-		speaker.Lock()
-		ctrl.Paused = !ctrl.Paused
-		volume.Volume += 0.5
-		speedy.SetRatio(speedy.Ratio() + 0.1)
-		speaker.Unlock()
+		shot := buffer.Streamer(0, buffer.Len())
+		speaker.Play(shot)
 	}
 }
