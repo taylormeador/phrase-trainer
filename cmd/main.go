@@ -5,12 +5,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/faiface/beep"
 	"github.com/faiface/beep/mp3"
 	"github.com/faiface/beep/speaker"
 )
 
 func main() {
-	f, err := os.Open("./cmd/msmw.mp3")
+	f, err := os.Open("./cmd/free_shevacadoo.mp3")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -22,6 +23,11 @@ func main() {
 	defer streamer.Close()
 
 	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
-	speaker.Play(streamer)
-	select {}
+
+	done := make(chan bool)
+	speaker.Play(beep.Seq(streamer, beep.Callback(func() {
+		done <- true
+	})))
+
+	<-done
 }
