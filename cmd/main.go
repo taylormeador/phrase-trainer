@@ -25,22 +25,15 @@ func main() {
 
 	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 
-	loop := beep.Loop(3, streamer)
-	fast := beep.ResampleRatio(4, 5, loop)
-
-	done := make(chan bool)
-	speaker.Play(beep.Seq(fast, beep.Callback(func() {
-		done <- true
-	})))
+	ctrl := &beep.Ctrl{Streamer: beep.Loop(-1, streamer), Paused: false}
+	speaker.Play(ctrl)
 
 	for {
-		select {
-		case <-done:
-			return
-		case <-time.After(time.Second):
-			speaker.Lock()
-			fmt.Println(format.SampleRate.D(streamer.Position()).Round(time.Second))
-			speaker.Unlock()
-		}
+		fmt.Print("Press [ENTER] to pause/resume. ")
+		fmt.Scanln()
+
+		speaker.Lock()
+		ctrl.Paused = !ctrl.Paused
+		speaker.Unlock()
 	}
 }
