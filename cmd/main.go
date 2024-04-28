@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -21,18 +20,15 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer streamer.Close()
 
 	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 
-	buffer := beep.NewBuffer(format)
-	buffer.Append(streamer)
-	streamer.Close()
+	loop := beep.Loop(3, streamer)
 
-	for {
-		fmt.Print("Press [ENTER] to play the sound")
-		fmt.Scanln()
-
-		shot := buffer.Streamer(0, buffer.Len())
-		speaker.Play(shot)
-	}
+	done := make(chan bool)
+	speaker.Play(beep.Seq(loop, beep.Callback(func() {
+		done <- true
+	})))
+	<-done
 }
