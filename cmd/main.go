@@ -20,11 +20,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer streamer.Close()
+
+	buffer := beep.NewBuffer(format)
+	buffer.Append(streamer)
+
+	half := buffer.Streamer(buffer.Len()/4, buffer.Len()/2)
+	loop := beep.Loop(3, half)
 
 	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
-
-	loop := beep.Loop(3, streamer)
 
 	done := make(chan bool)
 	speaker.Play(beep.Seq(loop, beep.Callback(func() {

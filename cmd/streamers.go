@@ -2,9 +2,13 @@ package main
 
 import (
 	"math/rand"
+
+	"github.com/gopxl/beep"
 )
 
-type SnippetStreamer struct{}
+type SnippetStreamer struct {
+	beep.Streamer
+}
 
 func (no SnippetStreamer) Stream(samples [][2]float64) (n int, ok bool) {
 	for i := range samples {
