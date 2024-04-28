@@ -35,20 +35,21 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	snippet.Play()
 
-	ps, err := filter.NewFFTShifter(2, 1)
+	ps, err := filter.NewFFTShifter(2048, 32)
 	if err != nil {
 		log.Fatal(err)
 	}
-	encoding := ps.PitchShift(1.5)
+	encoding := ps.PitchShift(0.5)
+
+	// encoding := filter.Speed(2, ps)
 
 	snippet, err = snippet.Filter(encoding)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// snippet.Play()
+	snippet.Play()
 
 	select {}
 
