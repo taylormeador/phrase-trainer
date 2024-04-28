@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/200sc/klangsynthese/audio/filter"
-	kmp3 "github.com/200sc/klangsynthese/mp3"
+	"github.com/200sc/klangsynthese/mp3"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	snippet, err := kmp3.Load(f)
+	snippet, err := mp3.Load(f)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -23,11 +23,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	encoding := ps.PitchShift(0.5)
 
-	// encoding := filter.Speed(2, ps)
+	encoding := ps.PitchShift(1.5)
 
 	snippet, err = snippet.Filter(encoding)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	loop := filter.LoopOn()
+
+	snippet, err = loop.Apply(snippet)
 	if err != nil {
 		log.Fatal(err)
 	}
