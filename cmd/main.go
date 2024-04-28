@@ -10,14 +10,18 @@ import (
 	"github.com/gopxl/beep/speaker"
 )
 
-func createSnippet(s beep.Streamer, f beep.Format, start int, end int, loops int) beep.Streamer {
+func createSnippet(s beep.Streamer, f beep.Format, start int, end int, loops int, ratio float64) beep.Streamer {
 	buffer := beep.NewBuffer(f)
 	buffer.Append(s)
 
 	half := buffer.Streamer(buffer.Len()/start, buffer.Len()/end)
 	loop := beep.Loop(loops, half)
 
-	return loop
+	fast := beep.ResampleRatio(4, ratio, loop)
+
+	// TODO correct the pitch here.
+
+	return fast
 }
 
 func main() {
@@ -31,7 +35,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	snippet := createSnippet(streamer, format, 4, 2, 3)
+	start := 4
+	end := 2
+	loops := 2
+	ratio := 1.1
+	snippet := createSnippet(streamer, format, start, end, loops, ratio)
 
 	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 
