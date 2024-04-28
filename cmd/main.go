@@ -10,6 +10,16 @@ import (
 	"github.com/gopxl/beep/speaker"
 )
 
+func createSnippet(s beep.Streamer, f beep.Format, start int, end int, loops int) beep.Streamer {
+	buffer := beep.NewBuffer(f)
+	buffer.Append(s)
+
+	half := buffer.Streamer(buffer.Len()/start, buffer.Len()/end)
+	loop := beep.Loop(loops, half)
+
+	return loop
+}
+
 func main() {
 	f, err := os.Open("./cmd/free_shevacadoo.mp3")
 	if err != nil {
@@ -21,16 +31,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	buffer := beep.NewBuffer(format)
-	buffer.Append(streamer)
-
-	half := buffer.Streamer(buffer.Len()/4, buffer.Len()/2)
-	loop := beep.Loop(3, half)
+	snippet := createSnippet(streamer, format, 4, 2, 3)
 
 	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 
 	done := make(chan bool)
-	speaker.Play(beep.Seq(loop, beep.Callback(func() {
+	speaker.Play(beep.Seq(snippet, beep.Callback(func() {
 		done <- true
 	})))
 	<-done
