@@ -1,28 +1,11 @@
 package main
 
 import (
-	"log"
+	"bufio"
+	"fmt"
 	"os"
-	"time"
-
-	"github.com/gopxl/beep"
-	"github.com/gopxl/beep/mp3"
-	"github.com/gopxl/beep/speaker"
+	"strings"
 )
-
-func createSnippet(s beep.Streamer, f beep.Format, start int, end int, loops int, ratio float64) beep.Streamer {
-	buffer := beep.NewBuffer(f)
-	buffer.Append(s)
-
-	half := buffer.Streamer(buffer.Len()/start, buffer.Len()/end)
-	loop := beep.Loop(loops, half)
-
-	fast := beep.ResampleRatio(4, ratio, loop)
-
-	// TODO correct the pitch here.
-
-	return fast
-}
 
 // Want to flesh out functionality of creating a snippet. Basically everything a user has to do before we send the audio to Python
 // 1. User uploads their own mp3
@@ -32,31 +15,27 @@ func createSnippet(s beep.Streamer, f beep.Format, start int, end int, loops int
 // 5. Go calls Python script that slices the audio, creates copies at different speeds, and writes them to blob? local?
 
 func main() {
-	// Open file
-	f, err := os.Open("./cmd/free_shevacadoo.mp3")
-	if err != nil {
-		log.Fatal(err)
+	// Loop and get commands from user
+	r := bufio.NewReader(os.Stdin)
+
+	for {
+		fmt.Print("-> ")
+
+		var input string
+
+		input, _ = r.ReadString('\n')
+		input = strings.Replace(input, "\n", "", -1)
+		words := strings.Split(input, " ")
+
+		var command string
+		var args []string
+
+		command = words[0]
+		args = words[1:]
+
+		fmt.Println(command)
+		for i, a := range args {
+			fmt.Println(i, a)
+		}
 	}
-
-	// Decode audio to Streamer
-	streamer, format, err := mp3.Decode(f)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Create the snippet with parameters
-	start := 4
-	end := 2
-	loops := 2
-	ratio := 1.1
-	snippet := createSnippet(streamer, format, start, end, loops, ratio)
-
-	// Play
-	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
-
-	done := make(chan bool)
-	speaker.Play(beep.Seq(snippet, beep.Callback(func() {
-		done <- true
-	})))
-	<-done
 }
