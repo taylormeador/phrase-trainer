@@ -15,6 +15,8 @@ import (
 // 4. User runs command `createphrase <song name> <start timestamp> <end timestamp>`
 // 5. Go calls Python script that slices the audio, creates copies at different speeds, and writes them to blob? local?
 
+var bucketName = os.Getenv("BUCKET_NAME")
+
 func main() {
 	// Loop and get commands from user
 	r := bufio.NewReader(os.Stdin)
@@ -28,7 +30,12 @@ func main() {
 
 		switch command {
 		case "upload":
-			err := upload(client, args)
+			err := Upload(client, args)
+			if err != nil {
+				log.Fatal(err)
+			}
+		case "delete-all-s3-objects":
+			err := DeleteAll(client)
 			if err != nil {
 				log.Fatal(err)
 			}
