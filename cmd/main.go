@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"phrasetrainer.tm.com/internal/aws/s3utils"
+	"phrasetrainer.tm.com/internal/db"
 )
 
 // Want to flesh out functionality of creating a phrase. Basically everything a user has to do before we send the audio to Python
@@ -20,6 +21,11 @@ import (
 var bucketName = os.Getenv("BUCKET_NAME")
 
 func main() {
+
+	// Connect to db
+	db := db.Connect()
+	fmt.Println(db)
+
 	// Loop and get commands from user
 	r := bufio.NewReader(os.Stdin)
 

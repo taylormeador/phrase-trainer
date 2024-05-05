@@ -10,7 +10,7 @@ import (
 	"phrasetrainer.tm.com/internal/aws/s3utils"
 )
 
-// Upload() wraps the UploadFile() method from AWS and
+// Upload wraps the UploadFile method from AWS and
 // uses a UUID for the name of the blob.
 func Upload(client *s3.Client, args []string) error {
 	// TODO: Need to log the upload
@@ -23,7 +23,7 @@ func Upload(client *s3.Client, args []string) error {
 	return err
 }
 
-// List() wraps the ListObjects() method from AWS and prints out the
+// List wraps the ListObjects method from AWS and prints out the
 // name of each blob on a new line.
 func List(client *s3.Client) error {
 	basics := s3utils.BucketBasics{S3Client: client}
