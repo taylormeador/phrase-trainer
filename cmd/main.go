@@ -34,6 +34,11 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
+		case "list":
+			err := List(client)
+			if err != nil {
+				log.Fatal(err)
+			}
 		case "delete-all-s3-objects":
 			err := DeleteAll(client)
 			if err != nil {

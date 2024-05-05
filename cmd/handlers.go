@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -15,6 +16,20 @@ func Upload(client *s3.Client, args []string) error {
 
 	b := BucketBasics{S3Client: client}
 	err := b.UploadFile(bucketName, objectKey, fileName)
+	return err
+}
+
+func List(client *s3.Client) error {
+	basics := BucketBasics{S3Client: client}
+	objects, err := basics.ListObjects(bucketName)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, o := range objects {
+		fmt.Println(*o.Key)
+	}
+
 	return err
 }
 
