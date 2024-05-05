@@ -46,7 +46,13 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
+		case "exit":
+			fmt.Println("Bye!")
+			return
+		default:
+			fmt.Println("Command not recognized")
 		}
+
 	}
 }
 
