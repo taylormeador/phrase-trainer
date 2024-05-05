@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -24,7 +25,7 @@ func main() {
 
 	// Connect to db
 	db := db.Connect()
-	fmt.Println(db)
+	defer db.Close(context.Background())
 
 	// Loop and get commands from user
 	r := bufio.NewReader(os.Stdin)

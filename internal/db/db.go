@@ -24,7 +24,7 @@ func Connect() *pgx.Conn {
 		log.Fatal("failed to execute query", err)
 	}
 
-	fmt.Println(now)
+	fmt.Println("Successfully connected to db", now)
 
 	return conn
 }
