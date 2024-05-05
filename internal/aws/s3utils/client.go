@@ -1,4 +1,4 @@
-package internal
+package s3utils
 
 import (
 	"context"
