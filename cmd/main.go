@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 )
@@ -27,7 +28,10 @@ func main() {
 
 		switch command {
 		case "upload":
-			upload(client, args)
+			err := upload(client, args)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 	}
 }
