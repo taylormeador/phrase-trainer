@@ -8,6 +8,8 @@ import (
 	"os"
 	"strings"
 
+	crdbpgx "github.com/cockroachdb/cockroach-go/v2/crdb/crdbpgxv5"
+	"github.com/jackc/pgx/v5"
 	"phrasetrainer.tm.com/internal/aws/s3utils"
 	"phrasetrainer.tm.com/internal/db"
 )
@@ -23,9 +25,16 @@ var bucketName = os.Getenv("BUCKET_NAME")
 
 func main() {
 
-	// Connect to db
-	db := db.Connect()
-	defer db.Close(context.Background())
+	// Connect to database and create table
+	conn := db.Connect()
+	defer conn.Close(context.Background())
+
+	err := crdbpgx.ExecuteTx(context.Background(), conn, pgx.TxOptions{}, func(tx pgx.Tx) error {
+		return db.InitTable(context.Background(), tx)
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Loop and get commands from user
 	r := bufio.NewReader(os.Stdin)

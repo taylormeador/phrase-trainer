@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
 )
 
 func Connect() *pgx.Conn {
@@ -27,4 +27,11 @@ func Connect() *pgx.Conn {
 	fmt.Println("Successfully connected to db", now)
 
 	return conn
+}
+
+func InitTable(ctx context.Context, tx pgx.Tx) error {
+	if _, err := tx.Exec(ctx, userUploadsDDL); err != nil {
+		return err
+	}
+	return nil
 }
