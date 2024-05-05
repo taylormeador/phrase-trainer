@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-func getAWSClient() *s3.Client {
+func GetS3Client() *s3.Client {
 	// Load the Shared AWS Configuration (~/.aws/config)
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {

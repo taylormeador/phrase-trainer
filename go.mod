@@ -1,4 +1,4 @@
-module phrasetrainer.taylormeador.com
+module phrasetrainer.tm.com
 
 go 1.22.0
 

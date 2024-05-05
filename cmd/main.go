@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	"phrasetrainer.tm.com/internal"
 )
 
 // Want to flesh out functionality of creating a phrase. Basically everything a user has to do before we send the audio to Python
@@ -26,7 +28,7 @@ func main() {
 		fmt.Print("-> ")
 		command, args := parseInput(r)
 
-		client := getAWSClient()
+		client := internal.GetS3Client()
 
 		switch command {
 		case "upload":

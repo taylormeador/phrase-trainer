@@ -6,6 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/google/uuid"
+
+	"phrasetrainer.tm.com/internal"
 )
 
 func Upload(client *s3.Client, args []string) error {
@@ -14,13 +16,13 @@ func Upload(client *s3.Client, args []string) error {
 	objectKey := uuid.New().String()
 	fileName := args[0]
 
-	b := BucketBasics{S3Client: client}
+	b := internal.BucketBasics{S3Client: client}
 	err := b.UploadFile(bucketName, objectKey, fileName)
 	return err
 }
 
 func List(client *s3.Client) error {
-	basics := BucketBasics{S3Client: client}
+	basics := internal.BucketBasics{S3Client: client}
 	objects, err := basics.ListObjects(bucketName)
 	if err != nil {
 		log.Fatal(err)
@@ -37,7 +39,7 @@ func List(client *s3.Client) error {
 // intended to be run manually. This will save costs by getting rid of objects
 // created during development.
 func DeleteAll(client *s3.Client) error {
-	basics := BucketBasics{S3Client: client}
+	basics := internal.BucketBasics{S3Client: client}
 	objects, err := basics.ListObjects(bucketName)
 	if err != nil {
 		log.Fatal(err)
