@@ -2,16 +2,11 @@ package main
 
 import (
 	"bufio"
-	"context"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
 	"github.com/google/uuid"
-
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 // Want to flesh out functionality of creating a phrase. Basically everything a user has to do before we send the audio to Python
@@ -30,14 +25,7 @@ func main() {
 		fmt.Print("-> ")
 		command, args := parseInput(r)
 
-		// Load the Shared AWS Configuration (~/.aws/config)
-		cfg, err := config.LoadDefaultConfig(context.TODO())
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		// Create an Amazon S3 service client
-		client := s3.NewFromConfig(cfg)
+		client := getAWSClient()
 
 		switch command {
 		case "upload":
