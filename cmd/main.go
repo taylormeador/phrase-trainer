@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-
-	"github.com/google/uuid"
 )
 
 // Want to flesh out functionality of creating a phrase. Basically everything a user has to do before we send the audio to Python
@@ -29,11 +27,7 @@ func main() {
 
 		switch command {
 		case "upload":
-			bucketName := "phrase-trainer"
-			objectKey := uuid.New().String()
-			fileName := args[0]
-			b := BucketBasics{S3Client: client}
-			b.UploadFile(bucketName, objectKey, fileName)
+			upload(client, args)
 		}
 	}
 }
