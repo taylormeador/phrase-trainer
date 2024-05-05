@@ -28,18 +28,7 @@ func main() {
 	for {
 		// Parse user input into variables
 		fmt.Print("-> ")
-
-		var input string
-
-		input, _ = r.ReadString('\n')
-		input = strings.Replace(input, "\n", "", -1)
-		words := strings.Split(input, " ")
-
-		var command string
-		var args []string
-
-		command = words[0]
-		args = words[1:]
+		command, args := parseInput(r)
 
 		// Load the Shared AWS Configuration (~/.aws/config)
 		cfg, err := config.LoadDefaultConfig(context.TODO())
@@ -59,4 +48,26 @@ func main() {
 			b.UploadFile(bucketName, objectKey, fileName)
 		}
 	}
+}
+
+func parseInput(r *bufio.Reader) (string, []string) {
+	var input string
+	var command string
+	var args []string
+
+	input, _ = r.ReadString('\n')
+
+	// Make CR LF into LF
+	input = strings.Replace(input, "\n", "", -1)
+
+	words := strings.Split(input, " ")
+
+	// Commands will always be one word (the first word)
+	// followed by any number of arguments (if any)
+	command = words[0]
+	args = words[1:]
+
+	// TODO: validate `command` and `args`
+
+	return command, args
 }
