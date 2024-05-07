@@ -1,25 +1,43 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	crdbpgx "github.com/cockroachdb/cockroach-go/v2/crdb/crdbpgxv5"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 
 	"phrasetrainer.tm.com/internal/aws/s3utils"
+	"phrasetrainer.tm.com/internal/constants"
+	"phrasetrainer.tm.com/internal/db"
 )
+
+func LogUpload(conn *pgx.Conn, userID int, fileLabel string, objectKey string) error {
+	err := crdbpgx.ExecuteTx(context.Background(), conn, pgx.TxOptions{}, func(tx pgx.Tx) error {
+		return db.InsertRow(context.Background(), tx, userID, time.Now(), fileLabel, objectKey)
+	})
+	return err
+}
 
 // Upload wraps the UploadFile method from AWS and
 // uses a UUID for the name of the blob.
-func Upload(client *s3.Client, args []string) error {
-	// TODO: Need to log the upload
-	// TODO: Need to map upload to user
+func Upload(client *s3.Client, conn *pgx.Conn, args []string) error {
 	objectKey := uuid.New().String()
 	fileName := args[0]
 
 	b := s3utils.BucketBasics{S3Client: client}
-	err := b.UploadFile(bucketName, objectKey, fileName)
+	err := b.UploadFile(constants.BucketName, objectKey, fileName)
+	if err != nil {
+		return err
+	}
+
+	userID := 1 // TODO: user stuff not implemented yet
+	fileLabel := constants.USER_MP3_UPLOAD
+	err = LogUpload(conn, userID, fileLabel, objectKey)
 	return err
 }
 
@@ -27,7 +45,7 @@ func Upload(client *s3.Client, args []string) error {
 // name of each blob on a new line.
 func List(client *s3.Client) error {
 	basics := s3utils.BucketBasics{S3Client: client}
-	objects, err := basics.ListObjects(bucketName)
+	objects, err := basics.ListObjects(constants.BucketName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,7 +62,7 @@ func List(client *s3.Client) error {
 // created during development.
 func DeleteAll(client *s3.Client) error {
 	basics := s3utils.BucketBasics{S3Client: client}
-	objects, err := basics.ListObjects(bucketName)
+	objects, err := basics.ListObjects(constants.BucketName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -53,7 +71,7 @@ func DeleteAll(client *s3.Client) error {
 	for _, o := range objects {
 		keys = append(keys, *o.Key)
 	}
-	err = basics.DeleteObjects(bucketName, keys)
+	err = basics.DeleteObjects(constants.BucketName, keys)
 
 	return err
 }

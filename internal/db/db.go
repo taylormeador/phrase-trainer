@@ -35,3 +35,15 @@ func InitTable(ctx context.Context, tx pgx.Tx) error {
 	}
 	return nil
 }
+
+func InsertRow(ctx context.Context, tx pgx.Tx, userID int, timestamp time.Time, fileLabel string, blobName string) error {
+	sql := `
+		INSERT INTO user_uploads (user_id, timestamp, file_label, blob_name)
+		VALUES ($1, $2, $3, $4);
+	`
+
+	if _, err := tx.Exec(ctx, sql, userID, timestamp, fileLabel, blobName); err != nil {
+		return err
+	}
+	return nil
+}
