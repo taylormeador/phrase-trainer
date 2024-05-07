@@ -6,7 +6,9 @@ var userUploadsDDL string = `
 		id SERIAL PRIMARY KEY,
 		user_id INT,
 		timestamp TIMESTAMP,
+		file_name varchar(128),
 		file_label varchar(128),
-		blob_name char(36)
+		blob_name char(36),
+		UNIQUE(user_id, file_name)
 	);
 `

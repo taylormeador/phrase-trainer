@@ -50,6 +50,11 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
+		case "play":
+			err := Play(client, conn, args)
+			if err != nil {
+				log.Fatal(err)
+			}
 		case "list":
 			err := List(client)
 			if err != nil {

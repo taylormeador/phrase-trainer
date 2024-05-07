@@ -16,9 +16,9 @@ import (
 	"phrasetrainer.tm.com/internal/db"
 )
 
-func LogUpload(conn *pgx.Conn, userID int, fileLabel string, objectKey string) error {
+func LogUpload(conn *pgx.Conn, userID int, fileName string, fileLabel string, objectKey string) error {
 	err := crdbpgx.ExecuteTx(context.Background(), conn, pgx.TxOptions{}, func(tx pgx.Tx) error {
-		return db.InsertRow(context.Background(), tx, userID, time.Now(), fileLabel, objectKey)
+		return db.InsertRow(context.Background(), tx, userID, time.Now(), fileName, fileLabel, objectKey)
 	})
 	return err
 }
@@ -37,7 +37,23 @@ func Upload(client *s3.Client, conn *pgx.Conn, args []string) error {
 
 	userID := 1 // TODO: user stuff not implemented yet
 	fileLabel := constants.USER_MP3_UPLOAD
-	err = LogUpload(conn, userID, fileLabel, objectKey)
+	err = LogUpload(conn, userID, fileName, fileLabel, objectKey)
+	return err
+}
+
+func Play(client *s3.Client, conn *pgx.Conn, args []string) error {
+	// play <song name>
+	// look up blob from user_uploads
+	// download file
+	// play with beep library
+	userID := 1
+	songName := args[0]
+	err := crdbpgx.ExecuteTx(context.Background(), conn, pgx.TxOptions{}, func(tx pgx.Tx) error {
+		blobName, err := db.GetUserUploadData(context.Background(), tx, userID, songName)
+		fmt.Println(blobName)
+		return err
+	})
+
 	return err
 }
 
