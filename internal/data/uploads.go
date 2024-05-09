@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -21,7 +22,7 @@ type UploadModel struct {
 }
 
 // TODO: Implement Get(), Insert(), Validate()
-func (u UploadModel) Insert(ctx context.Context, tx pgx.Tx, upload Upload) error {
+func (u UploadModel) Insert(ctx context.Context, tx pgx.Tx, upload *Upload) error {
 	sql := `
 	INSERT INTO user_uploads
 		(user_id, timestamp, file_name, file_label, blob_name)
@@ -32,4 +33,22 @@ func (u UploadModel) Insert(ctx context.Context, tx pgx.Tx, upload Upload) error
 	_, err := tx.Exec(ctx, sql, args...)
 
 	return err // TODO will this be nil?
+}
+
+func (u UploadModel) Get() (*Upload, error) {
+	sql := `
+		SELECT id, user_id, timestamp, file_name, file_label, blob_name
+		FROM user_uploads
+		WHERE id = $1;
+	`
+	rows, err := u.Conn.Query(context.Background(), sql)
+	if err != nil {
+		log.Fatal(err) // TODO is this right?
+	}
+	defer rows.Close()
+
+	var upload Upload
+	err = rows.Scan(&upload.ID, &upload.UserID, &upload.Timestamp, &upload.FileName, &upload.FileLabel, &upload.BlobName)
+
+	return &upload, err
 }
