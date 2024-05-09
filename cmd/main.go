@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 	"time"
@@ -26,17 +27,30 @@ func main() {
 	// Create an Upload.
 	upload := &data.Upload{ID: 0, UserID: 1, Timestamp: time.Now(), FileName: "file name", FileLabel: "file label", BlobName: "asdfwf-asdfawef-asdfawef-awsefasef"}
 
-	// Insert the Upload.
+	// // Insert the Upload.
+	// models := data.NewModels(conn)
+	// err = crdbpgx.ExecuteTx(context.Background(), conn, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	// 	return models.Uploads.Insert(context.Background(), tx, upload)
+	// })
+	// if err != nil {
+	// 	logger.Error(err.Error())
+	// }
+
+	// logger.Info("Insert was successful")
+
 	models := data.NewModels(conn)
+
+	// Get a known upload by ID.
+	var uploadID int64 = 967147961206865921
 	err = crdbpgx.ExecuteTx(context.Background(), conn, pgx.TxOptions{}, func(tx pgx.Tx) error {
-		return models.Uploads.Insert(context.Background(), tx, upload)
+		upload, err = models.Uploads.Get(context.Background(), tx, uploadID)
+		return err
 	})
 	if err != nil {
 		logger.Error(err.Error())
 	}
 
-	logger.Info("Insert was successful")
-
+	fmt.Printf("%+v\n", upload)
 }
 
 func openConn() (*pgx.Conn, error) {

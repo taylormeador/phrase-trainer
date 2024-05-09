@@ -20,7 +20,9 @@ type UploadModel struct {
 	Conn *pgx.Conn
 }
 
-// TODO: Implement Get(), Insert(), Validate()
+// TODO: Implement Validate()
+
+// TODO: Return the ID
 func (u UploadModel) Insert(ctx context.Context, tx pgx.Tx, upload *Upload) error {
 	sql := `
 	INSERT INTO user_uploads
