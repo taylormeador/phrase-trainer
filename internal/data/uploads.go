@@ -2,7 +2,6 @@ package data
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -35,20 +34,17 @@ func (u UploadModel) Insert(ctx context.Context, tx pgx.Tx, upload *Upload) erro
 	return err // TODO will this be nil?
 }
 
-func (u UploadModel) Get() (*Upload, error) {
+func (u UploadModel) Get(ctx context.Context, tx pgx.Tx, userID int64) (*Upload, error) {
 	sql := `
 		SELECT id, user_id, timestamp, file_name, file_label, blob_name
 		FROM user_uploads
 		WHERE id = $1;
 	`
-	rows, err := u.Conn.Query(context.Background(), sql)
-	if err != nil {
-		log.Fatal(err) // TODO is this right?
-	}
-	defer rows.Close()
 
 	var upload Upload
-	err = rows.Scan(&upload.ID, &upload.UserID, &upload.Timestamp, &upload.FileName, &upload.FileLabel, &upload.BlobName)
+	err := tx.QueryRow(ctx, sql, userID).Scan(&upload.ID, &upload.UserID, &upload.Timestamp, &upload.FileName, &upload.FileLabel, &upload.BlobName)
 
-	return &upload, err
+	// return custom ErrRecordNotFound if the row doesn't exist
+
+	return &upload, err // I think this works because we want the logger to handle logging
 }

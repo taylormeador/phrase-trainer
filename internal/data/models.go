@@ -1,8 +1,9 @@
 package data
 
 import (
-	"database/sql"
 	"errors"
+
+	"github.com/jackc/pgx/v5"
 )
 
 var (
@@ -14,11 +15,8 @@ type Models struct {
 	Uploads UploadModel
 }
 
-func NewModels(db *sql.DB) Models {
+func NewModels(conn *pgx.Conn) Models {
 	return Models{
-		Movies:      MovieModel{DB: db},
-		Permissions: PermissionModel{DB: db},
-		Tokens:      TokenModel{DB: db},
-		Users:       UserModel{DB: db},
+		Uploads: UploadModel{Conn: conn},
 	}
 }
